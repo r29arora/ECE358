@@ -1,37 +1,33 @@
 
-function consumer(queueSize, ticTocTime, currentCombinedTime)
+function consumer(queueSize, ticTocTime)
 	"""
 	Consumes on tic() and toc() 
 	"""
-	totalTime = 0
-
-	while oneHundredPackets < 100
-		totalTime = totalTime + randomGenerator(ticTocTime, currentCombinedTime, oneHundredPackets)
-	end
+	totalTime = randomGenerator(ticTocTime)
 
 	println("This is how much time it took: ", totalTime)
 end
 
-function randomGenerator(ticTocTime, currentCombinedTime, oneHundredPackets)
+function randomGenerator(ticTocTime)
 	"""
 	generates on random time frame if it can. 
 	"""
+	totalTime = 0
+
+	currentPacketProcessingTime = 0
 
 	# How do we make this truely random?
 	# What if we produce a shit ton of random variables?
-
-	while currentCombinedTime <= ticTocTime 
-		tmp = rand()
-		currentCombinedTime = currentCombinedTime + tmp
-		oneHundredPackets = oneHundredPackets + 1
-		if oneHundredPackets == 100
-			return currentCombinedTime
+	for packetsProcessed = 1:100
+		println("it's running", packetsProcessed)
+		while currentPacketProcessingTime <= ticTocTime 
+			currentPacketProcessingTime = currentPacketProcessingTime + rand()
+			totalTime = totalTime + ticTocTime;
 		end
+		currentPacketProcessingTime = currentPacketProcessingTime - ticTocTime
 	end
 
-	currentCombinedTime = currentCombinedTime - ticTocTime
-
-	return currentCombinedTime
+	return totalTime
 
 end
 
@@ -46,13 +42,10 @@ else
 
 	ticTocTime = parseint(ARGS[5])
 
-	currentCombinedTime = -1
-	oneHundredPackets = 0
-
 
 	println("inputIsDeterministic: ", inputIsDeterministic)
 	println("outputIsDeterministic: ", outputIsDeterministic)
 	println("numOfServers: ", numOfServers)
-	println(consumer(queueSize, ticTocTime, currentCombinedTime))
+	println(consumer(queueSize, ticTocTime))
 	# println(gtsp_solver(queueSize, true))
 end
