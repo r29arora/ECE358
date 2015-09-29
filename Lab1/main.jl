@@ -5,31 +5,41 @@ function consumer(queueSize, ticTocTime)
 	"""
 	totalTime = randomGenerator(ticTocTime)
 
-	println("This is how much time it took: ", totalTime)
+	println("This is how much time it took to generate all the packets: ", totalTime)
 end
 
-function randomGenerator(ticTocTime)
-	"""
-	generates on random time frame if it can. 
-	"""
-	totalTime = 0
 
-	currentPacketProcessingTime = 0
 
-	# How do we make this truely random?
-	# What if we produce a shit ton of random variables?
-	for packetsProcessed = 1:100
-		println("it's running", packetsProcessed)
-		while currentPacketProcessingTime <= ticTocTime 
-			currentPacketProcessingTime = currentPacketProcessingTime + rand()
-			totalTime = totalTime + ticTocTime;
-		end
-		currentPacketProcessingTime = currentPacketProcessingTime - ticTocTime
-	end
-
-	return totalTime
-
+function calc_arrival_time()
+	u=rand(0,1) //generate random number between 0...1
+	arrival_time= ((-1/lambda)*log(1-u) * 1000000)
+	return arrival_time
 end
+
+function arrival()
+	if(t>=packet_arrival_time){
+		packet_queue.add(new_packet)
+		t_arrival=t + calc_arrival_time()
+		t_departure= t+ (packet_size/transmission_rate)
+		//Also need to consider packet loss case when queue is full
+	}
+end
+
+function departure()
+	if(t>=t_departure){
+		queue.pop()
+	}
+end
+
+main(args[]){
+		intialize_variables(args)
+		t_arrival = calc_arrival_time //calculate first packet arrival time
+		for(i=0;i<=num_of_ticks;i++){
+			arrival()
+			departure()
+		}
+		create_report();
+}
 
 # running the code on the problem instance passed in via command line args.
 if isempty(ARGS)
