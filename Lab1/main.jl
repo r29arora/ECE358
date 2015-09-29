@@ -2,12 +2,12 @@ function calc_arrival_time()
 	return (( -1 / AverageProcessingTime )*log(1 - rand(0:1)) * 1000000)
 end
 
-function arrival(t)
+function arrival()
 	if t>=packet_arrival_time
 		packet_queue.add(new_packet)
 		t_arrival= t + calc_arrival_time()
 		t_departure= t + (packet_size/transmission_rate)
-		//Also need to consider packet loss case when queue is full
+		''' Also need to consider packet loss case when queue is full '''
 	end
 end
 
@@ -16,11 +16,6 @@ function departure()
 		queue.pop()
 	end
 end
-
-main(args[]){
-		
-		
-}
 
 # running the code on the problem instance passed in via command line args.
 if isempty(ARGS)
