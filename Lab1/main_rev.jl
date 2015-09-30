@@ -1,6 +1,7 @@
 using DataStructures
 
 q = Queue(Any)
+dep_q = Queue(Any)
 
 function calc_time(lambda)
     # Generates a random time for the next packet
@@ -9,8 +10,8 @@ end
 
 avg_process_time = parseint(ARGS[4])
 t = 0
-transmission_rate = 1
-packet_size = 10
+transmission_rate = 10
+packet_size = 50
 
 t_arrival = calc_time(avg_process_time)
 t_departure = calc_time(avg_process_time)
@@ -28,22 +29,28 @@ function arrival()
     if t >= t_arrival 
         enqueue!(q, 1)
         t_arrival = t + calc_time(avg_process_time)
-#        println("q = ", q)
+        enqueue!(dep_q, t + (packet_size / transmission_rate))
+        println("new packet generated", length(q), "in queue")
     end    
     
-    if t >= t_departure && !isempty(q)
-        println("Packet Received ", length(q))
-        dequeue!(q)
-        t_departure = t + (packet_size / transmission_rate)
-    end
 end
-#
-#function departure()
-#    global t
-#    global t_departure
-#    global q
-#    
-#end
+
+function departure()
+    global t
+    global t_departure
+    global q
+    
+    if !isempty(dep_q) && !isempty(q)
+        earliest_dep = dequeue!(dep_q)
+        if t >= earliest_dep
+            dequeue!(q)
+            println("Packet Received ", length(q), "remaining")
+        else
+            enqueue!(dep_q, earliest_dep)
+        end
+    end
+    
+end
 
 num_ticks = parseint(ARGS[5])
 initial_t = calc_time(avg_process_time)
@@ -51,5 +58,5 @@ initial_t = calc_time(avg_process_time)
 for x = 0:num_ticks
     t = initial_t * x
     arrival()
-#    departure()
+    departure()
 end
