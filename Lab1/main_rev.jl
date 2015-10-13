@@ -2,7 +2,7 @@ using DataStructures
 
 queue_size = parse(Int, ARGS[6])
 
-q = Deque{Int}()
+q = Deque{Any}()
 
 received_packets = 0
 total_packets = 0
