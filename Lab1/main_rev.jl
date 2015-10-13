@@ -1,9 +1,8 @@
 using DataStructures
 
-queue_size = parseint(ARGS[6])
+queue_size = parse(Int, ARGS[6])
 
-q = Queue(Any)
-dep_q = Queue(Any)
+q = Deque{Int}()
 
 received_packets = 0
 total_packets = 0
@@ -18,13 +17,13 @@ function calc_time(lambda)
     return ((-1 / lambda) * log(1 - rand())) 
 end
 
-avg_process_time = parseint(ARGS[4])
+avg_process_time = parse(Int, ARGS[4])
 t = 0
 transmission_rate = 100
 packet_size = 50
 
 t_arrival = calc_time(avg_process_time)
-t_departure = calc_time(avg_process_time)
+t_departure = t_arrival + (packet_size / transmission_rate)
 initial_t = calc_time(avg_process_time)
 
 function arrival()
@@ -37,18 +36,13 @@ function arrival()
     global transmission_rate
     global total_packets
     global total_packet_length
-            
-    if t >= t_arrival 
-        if queue_size != -1 && length(q) >= queue_size 
-            # do nothing, queue is full
-        else 
-            enqueue!(q, 1)
-            t_arrival = t + calc_time(avg_process_time)
-            enqueue!(dep_q, t + (packet_size / transmission_rate)) 
-            total_packet_length = total_packet_length + length(q) 
-        end
 
-#        println("new packet generated", length(q), "in queue")
+    if t >= t_arrival 
+        t_departure = t + (packet_size / transmission_rate)
+        push!(q, t_departure)
+        t_arrival = t + calc_time(avg_process_time)
+        total_packet_length = total_packet_length + length(q) 
+        println("new packet generated")
         total_packets = total_packets + 1
     end    
 end
@@ -60,22 +54,23 @@ function departure()
     global received_packets
     global idle_time
     global initial_t
-    
-    if !isempty(dep_q) && !isempty(q)
-        earliest_dep = dequeue!(dep_q)
-        if t >= earliest_dep
-            dequeue!(q)
-#            println("Packet Received ", length(q), "remaining")
+        
+    if !isempty(q)
+        earliest_dep = shift!(q)
+
+        if t >= earliest_dep 
+            println("packet received")
             received_packets = received_packets + 1
         else
-            enqueue!(dep_q, earliest_dep)
-            idle_time = idle_time + initial_t
+            unshift!(q, earliest_dep)
+            idle_time = idle_time + 1
         end
     end
+
     
 end
 
-num_ticks = parseint(ARGS[5])
+num_ticks = parse(Int, ARGS[5])
 
 for x = 0:num_ticks
     t = initial_t * x
