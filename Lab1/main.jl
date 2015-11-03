@@ -38,7 +38,7 @@ else
 	transmission_rate = 2
 
 	queue = Queue(Any)
-
+    
 	t_arrival = calc_arrival_time()
 	t_departure = 10
 
