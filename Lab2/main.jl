@@ -1,5 +1,5 @@
-using DataStructures
-require("nodeStructures.jl")
+include("nodeStructures.jl")
+using DataStructures, NodeStructures
 
 #tick definition (1000 ticks = 1 second)
 const ticks_per_sec = 1000
@@ -17,3 +17,6 @@ packet_length = 1.5 * 8 # 1500 bytes in Megabits
 println("Number of Nodes: ", num_nodes)
 println("Arrival Rate (packets per tick): ", arrival_rate)
 println("Persistence paramter: ", persistence) 
+
+
+tnode = Node(-1)

@@ -4,16 +4,17 @@ type Node
 	bufferSize::Int
 	isServicing::Bool
 	lambda::Int
+	buffer::Deque
 
-	function Node()
-		new(-1, false, 10)
+	function Node(bufferSize::Int)
+		new(-bufferSize, false, 10, Deque{Any}())
 	end
 end
 
 function generate(node::Node)
 end
 
-function transmitn(node::Node)
+function transmit(node::Node)
 end
 
 function rtime(node::Node)
