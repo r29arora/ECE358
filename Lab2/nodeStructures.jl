@@ -1,7 +1,4 @@
-
 module NodeStructures
-	
 	export Node
-	
-	require("node.jl")
+	include("node.jl")
 end
