@@ -14,9 +14,18 @@ persistence = parse(Int, ARGS[3])
 packet_speed = 1 / ticks_per_sec # 1 Mbps in megabits/tick
 packet_length = 1.5 * 8 # 1500 bytes in Megabits 
 
+#Global defintion of time
+t = 0
+
 println("Number of Nodes: ", num_nodes)
 println("Arrival Rate (packets per tick): ", arrival_rate)
 println("Persistence paramter: ", persistence) 
 
 
-tnode = Node(-1)
+node = Node(-1)
+
+for x = 0:10000
+	t = t + 1.0 / ticks_per_sec
+	generate(node, t)
+	transmit(node, t)
+end
