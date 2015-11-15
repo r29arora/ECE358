@@ -2,7 +2,7 @@ using DataStructures
 
 type Node
 	bufferSize::Int
-	isTransmitting::Bool
+isTransmitting::Bool
 	lambda::Int
 	buffer::Deque
 	t_generate

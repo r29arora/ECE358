@@ -24,9 +24,10 @@ packet_length = 1.5 * 8 # 1500 bytes in Megabits
 nodes = Array(Node, num_nodes)
 fill!(nodes, Node(-1))
 
+node = Node(-1)
 
 for x = 0:10000
 	t = t + 1.0 / ticks_per_sec
-	generate(node, t)
-	transmit(node, t)
+	generate(nodes[1], t)
+	transmit(nodes[1], t)
 end
