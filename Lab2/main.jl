@@ -24,9 +24,9 @@ packet_length = 1.5 * 8 # 1500 bytes in Megabits
 # Array of nodes
 medium = Medium(3)
 
-medium.line[1] = (1,1)
-medium.line[2] = (1,1)
-medium.line[3] = (1,1)
+medium.line[1] = (1,1,2)
+medium.line[2] = (1,1,1)
+medium.line[3] = (1,1,1)
 
 println("Before:")
 println(medium.line)
