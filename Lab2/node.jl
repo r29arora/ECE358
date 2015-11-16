@@ -2,7 +2,7 @@ using DataStructures
 
 type Node
 	bufferSize::Int
-isTransmitting::Bool
+	isTransmitting::Bool
 	lambda::Int
 	buffer::Deque
 	t_generate
@@ -49,5 +49,8 @@ function transmit(node::Node, t)
 	if t >= node.t_transmit
 		node.isTransmitting = false
 		current_t_gen = shift!(node.buffer)
+		# println("transmtted at t = ", node.t_transmit)
 	end
+
+	return node.isTransmitting
 end

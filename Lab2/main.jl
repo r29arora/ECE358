@@ -1,5 +1,6 @@
 include("nodeStructures.jl")
-using DataStructures, NodeStructures
+include("MediumStructures.jl")
+using DataStructures, NodeStructures, MediumStructures
 
 # Tick definition (1000 ticks = 1 second)
 const ticks_per_sec = 1000
@@ -21,13 +22,14 @@ packet_speed = 1 / ticks_per_sec # 1 Mbps in megabits/tick
 packet_length = 1.5 * 8 # 1500 bytes in Megabits 
 
 # Array of nodes
-nodes = Array(Node, num_nodes)
-fill!(nodes, Node(-1))
+medium = Medium(3)
 
-node = Node(-1)
+medium.line[1] = (1,1)
+medium.line[2] = (1,1)
+medium.line[3] = (1,1)
 
-for x = 0:10000
-	t = t + 1.0 / ticks_per_sec
-	generate(nodes[1], t)
-	transmit(nodes[1], t)
-end
+println("Before:")
+println(medium.line)
+propogate(medium)
+println("After:")
+println(medium.line)
