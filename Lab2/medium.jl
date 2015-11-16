@@ -6,19 +6,43 @@ using DataStructures, NodeStructures
 
 type Medium
 	line::Array
+	nodes::Array
 	numNodes::Int
-	function Medium(numNodes::Int)
-		new(Array((Int, Int, Int), numNodes), numNodes)
+	function Medium(numNodes::Int, lambda)
+		array = Array(Node, numNodes)
+		
+		for x = 1:numNodes
+			array[x] = Node(-1, lambda)
+		end
+
+		line = Array((Int, Int), numNodes)
+		fill!(line, (0,0))
+
+		new(line, array, numNodes)
 	end
 end
-
+	
+function sense(medium::Medium, t)
+	for x = 1:medium.numNodes
+		result = transmit(medium.nodes[x], t)
+		if result != -1
+			packet = medium.line[x]
+			medium.line[x] = (packet[1] + 1, packet[2] + 1)
+			if packet[1] > 0 || packet[2]  > 0 
+				medium.nodes[x].t_transmit = medium.nodes[x].t_transmit + rtime(medium.nodes[x])
+			else
+				medium.line[x] = (packet[1] + 1, packet[2] + 1)
+			end
+		end
+	end
+end	
 
 function propogate(medium::Medium)
 	nodeTransferArray = Array((Int, Int, Int, Int), medium.numNodes)
 	fill!(nodeTransferArray, (0, 0, 0, 0))
 
 	for x = 1:medium.numNodes
-		packet::(Int, Int, Int) = medium.line[x]
+		packet::(Int, Int) = medium.line[x]
 		currentNode::(Int, Int, Int, Int) = nodeTransferArray[x]
 		currentNode = (packet[1], packet[2], 0, 0)
 		nodeTransferArray[x] = currentNode
@@ -46,15 +70,8 @@ function propogate(medium::Medium)
 	end
 
 	for x=1:medium.numNodes
-		packet::(Int, Int, Int) = medium.line[x]
+		packet::(Int, Int) = medium.line[x]
 		currentNode::(Int, Int, Int, Int) = nodeTransferArray[x]
-
-		packetValue = packet[3]
-
-		if packetValue > 0
-			packetValue = packetValue - 1
-		end
-
-		medium.line[x] = (currentNode[3], currentNode[4], packetValue)
+		medium.line[x] = (currentNode[3], currentNode[4])
 	end
 end

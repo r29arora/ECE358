@@ -4,7 +4,7 @@ using DataStructures, NodeStructures, MediumStructures
 
 # Tick definition (1000 ticks = 1 second)
 const speed_of_light = 3*(10^8)
-const prop_delay = 10 / (2/3)*speed_of_light
+const prop_delay = 10 / ((2/3)*speed_of_light)
 const ticks_per_sec = 1 / prop_delay
 
 # Global defintion of time
@@ -15,23 +15,23 @@ t = 0
 # Number of nodes
 num_nodes = parse(Int, ARGS[1])
 # Packets per second in packets per tick
-arrival_rate = parse(Int, ARGS[2]) / ticks_per_sec 
+arrival_rate = parse(Int, ARGS[2]) 
 # Persistence paramter for P-Persistent CSMA protocols
 persistence = parse(Int, ARGS[3]) 
-
-# Constant values
-packet_speed = 1 / ticks_per_sec # 1 Mbps in megabits/tick
-packet_length = 1.5 * 8 # 1500 bytes in Megabits 
+# Lambda - used for generating packets on every node
+lambda = convert(Int,arrival_rate * ticks_per_sec / 10)
 
 # Array of nodes
-medium = Medium(3)
+medium = Medium(num_nodes, lambda)
 
-medium.line[1] = (1,1,2)
-medium.line[2] = (1,1,1)
-medium.line[3] = (1,1,1)
+for x = 1:100
+	t = t + prop_delay
+	for y = 1:num_nodes
+		generate(medium.nodes[y], t)
+	end
 
-println("Before:")
-println(medium.line)
-propogate(medium)
-println("After:")
-println(medium.line)
+	propogate(medium)
+	sense(medium,t)
+	println(medium.line)
+end
+

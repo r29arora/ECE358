@@ -1,5 +1,14 @@
 using DataStructures
 
+# Tick definition (1000 ticks = 1 second)
+const speed_of_light = 3*(10^8)
+const prop_delay = 10 / ((2/3)*speed_of_light)
+const ticks_per_sec = 1 / prop_delay
+
+# Constant values
+const transmission_speed = 1 * ticks_per_sec # 1 Mbps in megabits/tick
+const packet_length = 1500 * 8 / 10^9 # 1500 bytes in Megabits 
+
 type Node
 	bufferSize::Int
 	isTransmitting::Bool
@@ -8,9 +17,13 @@ type Node
 	t_generate
 	t_transmit
 
-	function Node(bufferSize::Int)
-		lambda = 10
-		new(bufferSize, false, lambda, Deque{Any}(), 0, 0)
+	function Node(bufferSize::Int, lambda::Int)
+		new(bufferSize, 
+			false, 
+			lambda, 
+			Deque{Any}(),
+			((-1 / lambda) * log(1 - rand())), 
+			0)
 	end
 end
 
@@ -24,33 +37,38 @@ function generate(node::Node, t)
 	if t >= node.t_generate 
 		if node.bufferSize == -1
 			push!(node.buffer, node.t_generate)
+			t_gen = node.t_generate
 			node.t_generate = t + rtime(node)
-			# println("generated ", node.t_generate)
+			return t_gen
 		else
 			if length(node.buffer) < node.bufferSize
 				push!(node.buffer, node.t_generate)
+				t_gen = node.t_generate
 				node.t_generate = t + rtime(node)
+				return t_gen
 			end
 		end
 	end
+
+	return -1
 end
 
 # Transmit a single packet at a time 
 function transmit(node::Node, t)
 	if isempty(node.buffer) 
-		return
+		return -1
 	end
 
 	if !node.isTransmitting
 		node.isTransmitting = true
-		node.t_transmit = t + 0.0001 # TODO: Calculate transmission time
+		node.t_transmit = t + (packet_length / transmission_speed) # TODO: Calculate transmission time (Length / Rate)
 	end
 
 	if t >= node.t_transmit
 		node.isTransmitting = false
 		current_t_gen = shift!(node.buffer)
-		# println("transmtted at t = ", node.t_transmit)
+		return current_t_gen
 	end
 
-	return node.isTransmitting
+	return -1
 end
