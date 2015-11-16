@@ -3,7 +3,9 @@ include("MediumStructures.jl")
 using DataStructures, NodeStructures, MediumStructures
 
 # Tick definition (1000 ticks = 1 second)
-const ticks_per_sec = 1000
+const speed_of_light = 3*(10^8)
+const prop_delay = 10 / (2/3)*speed_of_light
+const ticks_per_sec = 1 / prop_delay
 
 # Global defintion of time
 t = 0
