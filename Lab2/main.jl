@@ -24,7 +24,7 @@ lambda = convert(Int,arrival_rate * ticks_per_sec / 10)
 # Array of nodes
 medium = Medium(num_nodes, lambda)
 
-for x = 1:100
+for x = 1:1000
 	t = t + prop_delay
 	for y = 1:num_nodes
 		generate(medium.nodes[y], t)
