@@ -12,7 +12,10 @@ const packet_length = 1500 * 8 / 10^9 # 1500 bytes in Megabits
 type Node
 	bufferSize::Int
 	isTransmitting::Bool
+	check::Int
 	lambda::Int
+	backoffCounter::Int
+	i::Int
 	buffer::Deque
 	t_generate
 	t_transmit
@@ -20,7 +23,10 @@ type Node
 	function Node(bufferSize::Int, lambda::Int)
 		new(bufferSize, 
 			false, 
-			lambda, 
+			0,
+			lambda,
+			0,
+			0,
 			Deque{Any}(),
 			((-1 / lambda) * log(1 - rand())), 
 			0)
@@ -29,7 +35,7 @@ end
 
 # random number generation based on a poisson distribution
 function rtime(node::Node)
-	return ((-1 / node.lambda) * log(1 - rand()))
+	return ((-node.lambda) * log(1 - rand()))
 end
 
 # Generation packets to add to the buffer of the node
@@ -59,7 +65,7 @@ function transmit(node::Node, t)
 		return -1
 	end
 
-	if !node.isTransmitting
+	if !node.isTransmitting && node.check == 0 && node.backoffCounter == 0
 		node.isTransmitting = true
 		node.t_transmit = t + (packet_length / transmission_speed) # TODO: Calculate transmission time (Length / Rate)
 	end
