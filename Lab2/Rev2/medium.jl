@@ -7,13 +7,13 @@ type Medium
 	total_received
 	function Medium(numNodes::Int, lambda)
 		nodesArray = Array(Node, numNodes)
-		lineArray = Array(Deque{(Int, Int, Int)}(), numNodes) # (Left, Right, Lifetime)
+		lineArray = Array(Any, numNodes) # (Left, Right, Lifetime)
 
 		for x=1:numNodes
 			nodesArray[x] = Node(lambda)
+			lineBuffer = Deque{(Int, Int, Int)}()
+			lineArray[x] = lineBuffer
 		end
-
-		fill!(lineArray,(0,0,0))
 
 		new(lineArray, nodesArray, numNodes, 0)
 	end
@@ -36,77 +36,75 @@ function sense(medium::Medium, t)
 		transmit(medium.nodes[x], t)
 
 		if !isempty(medium.nodes[x].outputBuffer)
-			currentLine::(Int, Int, Int) = medium.line[x]
+			currentLine::Deque = medium.line[x]
 			node::Node = medium.nodes[x]
 
-			if currentLine[3] == 0 && t >= node.t_wait
+			if isempty(currentLine)
 				destinationIndex = destination(medium,x)
-				medium.line[x] = (1,1,destinationIndex)
-				medium.nodes[x].t_wait = 0
+				packet1 = (1, 0, destinationIndex)
+				packet2 = (0, 1, destinationIndex)
+				push!(medium.line[x], packet1)
+				push!(medium.line[x], packet2)
+				# medium.nodes[x].t_wait = 0
 				shift!(medium.nodes[x].outputBuffer)
-				# println(medium.line)
+				# println("Sense: ", medium.line)
 			else
 				# the medium is busy, we must wait a random time
-				medium.nodes[x].t_wait = t + rtime(node.lambda)
+				# medium.nodes[x].t_wait = t + rtime(node.lambda)
 			end
 		end
-
 	end
-
 end
 
-function propogate(medium::Medium)
-	nodeTransferArray = Array((Int, Int, Int, Int, Int, Int), medium.numNodes)
-	fill!(nodeTransferArray, (0, 0, 0, 0, 0, 0))
-	println("Before:", medium.line)
+function prop(medium::Medium)
+	# propBuffer = Array(Any, medium.numNodes)
+
+	# # Create a temporary storage location for the new values
+	# for x=1:medium.numNodes
+	# 	propIndex = Deque{(Int, Int, Int)}()
+	# 	propBuffer[x] = propIndex
+	# end
+
+	# for x=1:medium.numNodes	
+	# 	currentNodeLine::Deque = medium.line[x]
+
+	# 	if !isempty(currentNodeLine)
+	# 		for y=1:length(currentNodeLine)
+	# 			value::(Int, Int, Int) = shift!(currentNodeLine)
+
+	# 			if value[1] == 1
+
+	# 				if y != 1
+	# 					for i=1:(value[3]-1)
+	# 						push!(propBuffer[i], value)
+	# 					end
+	# 				end	
+
+	# 			elseif value[2] == 1
+	# 				if y != medium.numNodes
+	# 					for i=(value[3]+1):medium.numNodes
+	# 						push!(propBuffer[i], value)
+	# 					end
+	# 				end
+	# 			end
+
+
+	# 		end
+	# 	end
+
+
+	# end
+
+	# medium.line = propBuffer
+	# println("Prop: ", medium.line)
 
 	for x=1:medium.numNodes
-		packet::(Int, Int, Int) = medium.line[x]
-		currentNode::(Int, Int, Int, Int, Int, Int) = nodeTransferArray[x]
-		currentNode = (packet[1], packet[2], packet[3], 0, 0, 0)
-		nodeTransferArray[x] = currentNode
-	end
-
-	println(nodeTransferArray)
-
-	println("------")
-
-	for x=1:medium.numNodes
-		currentNode::(Int, Int, Int, Int, Int, Int) = nodeTransferArray[x]
-
-		if x == 1
-			nextNode::(Int, Int, Int, Int, Int, Int) = nodeTransferArray[x+1]
-			nextNode = (nextNode[1], nextNode[2], nextNode[3], nextNode[4], nextNode[5] + currentNode[2], currentNode[3])
-			nodeTransferArray[x+1] = nextNode
-		elseif x == medium.numNodes
-			prevNode::(Int, Int, Int, Int, Int, Int) = nodeTransferArray[x-1]
-			nodeTransferArray[x-1] = (prevNode[1], prevNode[2], prevNode[3], prevNode[4] + currentNode[1], prevNode[5], prevNode[6])
-		else
-			prevNode2::(Int, Int, Int, Int, Int, Int) = nodeTransferArray[x-1]
-			nextNode2::(Int, Int, Int, Int, Int, Int) = nodeTransferArray[x+1]
-			nodeTransferArray[x-1] = (prevNode2[1], prevNode2[2], prevNode2[3], prevNode2[4] + currentNode[1], prevNode2[5], currentNode[3])
-			nodeTransferArray[x+1] = (nextNode2[1], nextNode2[2], nextNode2[3], nextNode2[4], nextNode2[5] + currentNode[2], currentNode[3])
+		if !isempty(medium.line[x])
+			shift!(medium.line[x])
+			shift!(medium.line[x])
 		end
-
-		println(nodeTransferArray)
-
 	end
-	println("------")
-	println(nodeTransferArray)
 
-	for x=1:medium.numNodes
-		packet::(Int, Int, Int) = medium.line[x]
-		currentNode::(Int, Int, Int, Int, Int, Int) = nodeTransferArray[x]
-		medium.line[x] = (currentNode[4], currentNode[5], currentNode[6])
-
-		# if currentNode[6] == x 
-		# 	medium.line[x] = (0, 0, 0) # packet reached destination
-		# 	medium.total_received = medium.total_received + 1
-		# else
-		# 	# packet still travelling
-		# end
-	end
-	println("After:" ,medium.line)
 end
 
 # returns the average throughput of the medium

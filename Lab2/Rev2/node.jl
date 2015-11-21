@@ -2,7 +2,7 @@ using DataStructures, CSMAStructures
 
 # random number generation based on a poisson distribution
 function rtime(lambda)
-	return ((-lambda) * log(1 - rand()))
+	return (((-lambda) * log(1 - rand())) / seconds_per_tick)
 end
 
 type Node
@@ -23,11 +23,11 @@ end
 
 # generation of packets into an infinite queue at a rate of lambda packets / tick
 function generate(node::Node, t)
-	# println(t, " >= ", node.t_generate)
 	if t >= node.t_generate
 		push!(node.buffer, node.t_generate)
 		node.t_generate = t + rtime(node.lambda)
 		node.total_generated = node.total_generated + 1
+		println("Generated at t = ", node.t_generate)
 	end
 end
 
@@ -39,16 +39,14 @@ function transmit(node::Node, t)
 
 	if !node.isTransmitting
 		node.isTransmitting = true
-		next_transmit = (packet_length / transmission_rate)
-		node.t_transmit = t + next_transmit
+		node.t_transmit = t + trans_delay
 	end
 
-	# println(t, " >= ", node.t_transmit)
 	if t >= node.t_transmit
 		node.isTransmitting = false
 		shift!(node.buffer)
-		node.total_transmitted = node.total_transmitted + 1
 		push!(node.outputBuffer, node.t_transmit)
-		# println(node.outputBuffer)
+		node.total_transmitted = node.total_transmitted + 1
+		# println("outputBuffer = ", node.outputBuffer)
 	end	
 end

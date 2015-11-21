@@ -13,16 +13,14 @@ end
 
 function run(csma::CSMA) 
 	lambda = csma.A * seconds_per_tick # arrival rate in (packets/tick)
-	node = Node(lambda)
+	println("Lambda = ", lambda, " packets per tick")
 	medium = Medium(csma.N, lambda)
 
-	medium.line[1] = (1,1,4)
-
-	for x = 0:num_ticks
+	for x = 1:num_ticks
+		csma.t = csma.t + 1
+		prop(medium)
+		sense(medium, csma.t)
 		# println(medium.line)
-		csma.t = csma.t + seconds_per_tick
-		# sense(medium, csma.t)
-		propogate(medium)
 	end
 			
 	println("total received = ", medium.total_received)		
