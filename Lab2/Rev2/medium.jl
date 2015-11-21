@@ -21,7 +21,7 @@ end
 
 function destination(medium::Medium, index)
 	destinationIndex = rand(1:medium.numNodes)
-	while destinationIndex != index
+	while destinationIndex == index
 		destinationIndex = rand(1:medium.numNodes)
 	end
 
@@ -41,6 +41,7 @@ function sense(medium::Medium, t)
 
 			if isempty(currentLine)
 				destinationIndex = destination(medium,x)
+				println("Packet at index ", x ," sent to index = ", destinationIndex)
 				packet1 = (1, 0, destinationIndex)
 				packet2 = (0, 1, destinationIndex)
 				push!(medium.line[x], packet1)
@@ -96,7 +97,6 @@ function prop(medium::Medium)
 	# end
 
 	# medium.line = propBuffer
-	# println("Prop: ", medium.line)
 
 	for x=1:medium.numNodes
 		if !isempty(medium.line[x])
@@ -104,6 +104,8 @@ function prop(medium::Medium)
 			shift!(medium.line[x])
 		end
 	end
+
+	# println("Prop: ", medium.line)
 
 end
 

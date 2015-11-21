@@ -27,7 +27,7 @@ function generate(node::Node, t)
 		push!(node.buffer, node.t_generate)
 		node.t_generate = t + rtime(node.lambda)
 		node.total_generated = node.total_generated + 1
-		println("Generated at t = ", node.t_generate)
+		# println("Generated at t = ", node.t_generate)
 	end
 end
 
