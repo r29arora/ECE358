@@ -7,17 +7,18 @@ end
 
 type Node
 	buffer::Deque # buffer for generated packets
-	lambda # rate of arrival of packets (packets / tick)
-	t_generate # tick for next generated packet
-	t_transmit # tick for next transmitted packet (rate of 1 Mbps)
-	isTransmitting # true if a packet is being transmitted to the medium
-	total_generated # total number of packets generated
-	total_transmitted # total number of packets transmitted to the medium
+	lambda::Float64  # rate of arrival of packets (packets / tick)
+	t_generate::Float64 # tick for next generated packet
+	t_transmit::Float64 # tick for next transmitted packet (rate of 1 Mbps)
+	isTransmitting::Bool # true if a packet is being transmitted to the medium
+	total_generated::Int # total number of packets generated
+	total_transmitted::Int # total number of packets transmitted to the medium
 	outputBuffer::Deque # packets waiting to be transmitted through the medium
-	t_wait # time before transmission through the medium is allowed
+	t_wait::Float64  # time before transmission through the medium is allowed
+	i::Int # counter for exponential backoff
 
 	function Node(lambda)
-		new(Deque{Any}(), lambda, rtime(lambda), 0, false, 0, 0, Deque{Any}(), 0)
+		new(Deque{Any}(), lambda, rtime(lambda), 0, false, 0, 0, Deque{Any}(), 0, 1)
 	end
 end
 

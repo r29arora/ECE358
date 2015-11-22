@@ -11,4 +11,6 @@ persistence = parse(Int, ARGS[3])
 
 
 csma = CSMA(num_nodes, arrival_rate, persistence)
-run(csma)
+
+@time run(csma)
+

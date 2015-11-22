@@ -3,7 +3,7 @@ using CSMAStructures
 type CSMA
 	N::Int # number of nodes
 	A::Int # arrival rate in packets / second
-	P::Int # persistence paramter (-1 for non-persistent)
+	P::Int # persistence paramter (-1 for non-persistent), value from 0 - 100 for probability
 	t      # defintion of time for simulation
 
 	function CSMA(N::Int, A::Int, P::Int)
@@ -19,10 +19,10 @@ function run(csma::CSMA)
 	for x = 1:num_ticks
 		csma.t = csma.t + 1
 		prop(medium)
-		sense(medium, csma.t)
-		# println(medium.line)
+		sense(medium, csma.t, csma.P)
 	end
 			
 	println("total received = ", medium.total_received)		
 	println("transmission rate (mpbs) = ", averageThroughput(medium))
+	println("collisions = ", medium.num_collisions)
 end
