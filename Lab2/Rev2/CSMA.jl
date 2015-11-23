@@ -19,10 +19,12 @@ function run(csma::CSMA)
 	for x = 1:num_ticks
 		csma.t = csma.t + 1
 		prop(medium)
+		collide(medium, csma.t)
 		sense(medium, csma.t, csma.P)
 	end
-			
+	
 	println("total received = ", medium.total_received)		
 	println("transmission rate (mpbs) = ", averageThroughput(medium))
 	println("collisions = ", medium.num_collisions)
+	println("packets dropped = ", medium.packets_dropped)
 end
