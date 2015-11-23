@@ -10,7 +10,7 @@ const transmission_rate = (10^6) # transmission rate in bits per second
 const trans_delay_s = packet_length / transmission_rate # transmission delay in seconds
 const trans_delay = trans_delay_s / seconds_per_tick
 
-const num_ticks = 100000
+const num_ticks = 500
 const Tp = 5
 # by the current defintion of a single tick, adjacent nodes are 10 ticks apart
 

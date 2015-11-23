@@ -5,7 +5,7 @@ using DataStructures, CSMAStructures
 # Number of nodes
 num_nodes = parse(Int, ARGS[1])
 # Packets per second in packets per tick
-arrival_rate = parse(Int, ARGS[2]) 
+arrival_rate = parse(Float64, ARGS[2]) 
 # Persistence paramter for P-Persistent CSMA protocols
 persistence = parse(Int, ARGS[3]) 
 
